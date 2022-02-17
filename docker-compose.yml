@@ -1,0 +1,32 @@
+version: '3.8' #Indica la versión del yml
+services: #Se define la lista de servicios que se desen ejecutar 
+  nodered: # primer servicio
+      container_name: Nodered #Nombre del contenedor de node red
+      image: nodered/node-red:latest # Cargar la imagen de node red
+      restart: always #Se colola para reiniciar, cuando haya fallas en el contenedor y pueda comenzar automaticamente
+      ports: #Indicar el puerto donde se inicializara Node-Red
+      - 1880:1880 
+      depends_on: #Permite que el inicio de ejecucuón de un servicio dependa de otro. 
+      - influxdb #Indica que node-red depende de influxDB. 
+
+  influxdb: #Fuente de datos para Node-red y Grafana 
+      container_name: InfluxDB #Nombre del contedor de InfluDB
+      image: influxdb #Cargar la imagen
+      restart: always #Se colola para reiniciar, cuando haya fallas en el contenedor y pueda comenzar automaticamente
+      environment: #Variables de entono de la configuración que estaran disponibles en el servicio
+        - INFLUXDB_DB=grafana #Creara una base de datos (Grafana) cuando se ejecute el contenedor
+        - INFLUXDB_USER=grafana #Crear un usuario (Grafana) para la Base de Datos
+        - INFLUXDB_USER_PASSWORD=password #Se crea un Contraseña para la Base de Datos
+        - INFLUXDB_ADMIN_ENABLE=true #Se habilita una cuenta de administrador para Influx
+        - INFLUXDB_ADMIN_USER=admin #Se crea un usuario 
+        - INFLUXDB_ADMIN_PASSWORD=password #Se crea un usuario 
+
+  grafana: #Segundo servicio
+      container_name: Grafana #Nombre del contedor de Grafana
+      image: grafana/grafana #Cargar la imagen
+      restart: always  #Se colola para reiniciar, cuando haya fallas en el contenedor y pueda comenzar automaticamente
+      ports: #Indicar el puerto donde se inicializara grafana
+      - 3000:3000
+      depends_on: #Permite que el inicio de ejecucuón de un servicio dependa de otro. 
+      - influxdb #Indica que node-red depende de influxDB. 
+     
